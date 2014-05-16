@@ -1,0 +1,113 @@
+<!doctype html>
+<html manifest="cache.manifest">
+    <head>
+		<title>MyRDP</title>
+        <meta charset="UTF-8" />
+		<meta content="yes" name="apple-mobile-web-app-capable" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+		<meta content="dive,table,padi,scuba" name="keywords" />
+		<meta content="Dive planner based on PADI dive tables" name="description" />
+		<link rel='apple-touch-icon' href='images/icon.png' />
+		<script src="js/jquery-1.4.4.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+		<script src="js/class.padi.js" type="text/javascript"></script>
+		<style type="text/css" media="screen">@import "css/jqtouch.min.css";</style>
+        <style type="text/css" media="screen">@import "css/apple/theme.min.css";</style>
+		<style type="text/css" media="screen">@import "css/custom.css";</style>
+		<script type="text/javascript">
+		 $.jQTouch({
+			icon: 'images/icon.png',
+			startupScreen: 'images/startup.png'
+		});
+		$(document).ready(function() {
+		
+			var rdp = new PadiRDP();
+			$('#calculate').bind('click', function(){
+				try {
+					rdp.setGroup( $('#InputGroup').val() || 'A' );
+				} catch (err) {
+					alert(err);
+				}
+
+				try {
+					rdp.setDepth( $('#InputDepth').val() || 35 );
+				} catch (err) {
+					alert(err);
+				}
+				
+				try {
+					rdp.setBottomTime( $('#InputTime').val() || 10 );
+				} catch (err) {
+					alert(err);
+				}
+
+				try {
+					rdp.setSurfaceInterval( $('#InputSurface').val() || 0 );
+				} catch (err) {
+					alert(err);
+				}
+				
+				try {
+					rdp.calc();
+					$('#Group').val( rdp.getGroup() );
+					$('#ResultGroup').val( rdp.getSurfaceGroup() );
+					if( rdp.safety() ) {
+						alert('Saftey stop required');
+					}
+				} catch (err) {
+					alert(err);
+				}
+				
+			});			
+			
+			$('#reset').bind('click',function(){
+				$('#InputGroup').val('A');
+				$('#InputDepth').val('35');
+				$('#InputTime').val('10');
+				$('#Group').val('');
+				$('#InputSurface').val('0');
+				$('#ResultGroup').val('');
+			});
+			
+		});
+		</script>
+		
+	</head>
+	<body>
+        <div id="home">
+            <div class="toolbar">
+                <h1>MyRDP</h1>
+				<a href="#" class="button leftButton flip" id="reset">Reset</a>
+                <a href="#info" class="button rightButton flip">About</a>
+            </div>
+			<div class="form">
+				<form id="divetable" onsubmit="return false;">
+					<ul class="rounded">
+						<li><label>Starting Group</label><input type="text" maxlength="1" placeholder="A" value="A" autocapitalization="on" id="InputGroup"/></li>
+						<li><label>Depth (ft)</label><input type="text" maxlength="3" value="35" placeholder="35" pattern="\d*" autocorrect="off" id="InputDepth"/></li>
+						<li><label>Bottom Time</label><input type="text" maxlength="3" value="10" placeholder="10" pattern="\d*" autocorrect="off" id="InputTime"/></li>
+					</ul>
+					<ul>
+						<li><label>Pressure Group</label><input type="text" maxlength="3" value="" Readonly='readonly' autocorrect="off" id="Group"></li>
+					</ul>
+					<ul>
+						<li><label>Surface Interval</label><input type="text" maxlength="3" value="0" placeholder="0" pattern="\d*" autocorrect="off" id="InputSurface"></li>
+						<li><label>Ending Group</label><input type="text" value="" readonly='readonly' autocorrect="off" id="ResultGroup"></li>
+					</ul>
+					<button class="whiteButton submit" id="calculate">Calculate</button>
+				</form>
+			</div>
+        </div>
+        <div id="info">
+            <div class="toolbar">
+                <h1>About</h1>
+                <a href="#add" class="cancel">Back</a>
+            </div>
+            <div class="info">
+                <h3>Disclaimer</h3>
+				<p>This application is only to be used for fresh air, no decompression, recreational dive planning. This does not replace an industry certified RDP. Validate all calculations, and use at your own risk.</p>
+            </div>
+        </div>
+    </body>
+</html>
